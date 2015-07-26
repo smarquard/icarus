@@ -18,7 +18,14 @@
 --------------------------------------------------------------*/
 
 // number of analog samples to take per reading
-#define NUM_SAMPLES 20
+#define NUM_SAMPLES     20
+
+// Sample and loop delays in milliseconds
+#define SAMPLE_DELAY    20
+#define LOOP_DELAY    4600
+
+// Number of samples (effectively the delay time) before switching power source
+#define MAX_SWITCH_COUNT   24
 
 int sum = 0;                    // sum of samples taken
 unsigned char sample_count = 0; // current sample number
@@ -29,9 +36,17 @@ int mains_power = 0;            // is mains power on?
 
 #define REF_VOLTAGE  4.97       // Arduino 5V voltage
 
-#define INV_REMOTE  8           // Output pin for inverter remote control
-#define INV_LIVE    9           // Output pin for inverter live power
-#define INV_NEUTRAL 10          // Output 
+#define INV_REMOTE      8       // Output pin for inverter remote control
+#define INV_LIVE        9       // Output pin for inverter live power
+#define INV_NEUTRAL    10       // Output pin for inverter neutral power
+
+// Voltage thresholds for switching between battery/solar and mains
+float v_upper = 12.55;
+float v_lower = 11.85;
+
+// Number of samples
+int switch_to_battery = 0;
+int switch_to_mains = 0;
 
 // Voltage divider A0: 12.59 / 2.11
 
@@ -63,7 +78,7 @@ void loop()
         sample_count++;
         // Serial.print("Actual: ");
         // Serial.println(sample);
-        delay(20);
+        delay(SAMPLE_DELAY);
     }
     // calculate the voltage
     // use 5.0 for a 5.0V ADC reference voltage
@@ -92,26 +107,44 @@ void loop()
     } else {
 
       // Battery getting low
-      if ((voltage < 12.1) && inverter) {
-          inverterOff();
+      if ((voltage < v_lower) && inverter) {
+          switch_to_mains++;
+      } else {
+           switch_to_mains = 0; 
       }
-         
+
       // Battery charged and/or solar power available
-      if ((voltage > 12.5) && !inverter) {
-        inverterOn();
+      if ((voltage > v_upper) && !inverter) {
+        switch_to_battery++;
+      } else {
+         switch_to_battery = 0; 
+      }
+      
+      if (switch_to_mains > MAX_SWITCH_COUNT) {
+        inverterOff();
+      }
+      
+      if (switch_to_battery > MAX_SWITCH_COUNT) {
+        inverterOn();        
       }
      
     }
     
     Serial.print(" inverter=");
     Serial.print(inverter);
+
+    Serial.print(" switch_to_mains=");
+    Serial.print(switch_to_mains);
+    
+    Serial.print(" switch_to_battery=");
+    Serial.print(switch_to_battery);    
     
     Serial.println();
     
     sample_count = 0;
     sum = 0;
     
-    delay(4600);
+    delay(LOOP_DELAY);
 }
 
 void inverterOn() {
