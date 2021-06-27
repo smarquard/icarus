@@ -1,0 +1,26 @@
+<html>
+<head>
+<link rel="shortcut icon" href="/favicon.ico">
+<title>Welcome to solarpi</title>
+<script src="/js/jquery.js"></script>
+<script src="/js/showinfo.js?v=6"></script>
+</head>
+<body bgcolor="white" text="black" onload="initInfo()">
+<center><h1>solarpi</h1></center>
+
+<p><div align="center" style="font-size: xx-large">
+Solar <span id="inverter"><!--#include file="staticdata/inverter.txt" -->W</span>
+Grid <span id="grid"><!--#include file="staticdata/grid.txt" -->W</span>
+</div></p>
+<p>
+<div class="mrtg-inverter" align="center"><a href="/mrtg/inverter.html"><img src="/mrtg/inverter-day.png?i=1" alt="Inverter"/></a></div>
+</p>
+
+<p><div align="center" style="font-size: xx-large">
+Battery <pan id="voltage"><!--#include file="staticdata/voltage.txt" --></span>
+</div></p>
+
+<p><div class="mrtg-voltage" align="center"><a href="/mrtg/voltage.html"><img src="/mrtg/voltage-day.png?i=1" alt="Voltage"/></a></div></p>
+
+</body>
+</html>
