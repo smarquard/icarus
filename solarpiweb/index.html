@@ -3,14 +3,14 @@
 <link rel="shortcut icon" href="/favicon.ico">
 <title>Welcome to solarpi</title>
 <script src="/js/jquery.js"></script>
-<script src="/js/showinfo.js?v=6"></script>
+<script src="/js/showinfo.js?v=7"></script>
 </head>
 <body bgcolor="white" text="black" onload="initInfo()">
 <center><h1>solarpi</h1></center>
 
 <p><div align="center" style="font-size: xx-large">
-Solar <span id="inverter"><!--#include file="staticdata/inverter.txt" -->W</span>
-Grid <span id="grid"><!--#include file="staticdata/grid.txt" -->W</span>
+<span id="inverter_label">Solar </span><span id="inverter"><!--#include file="staticdata/inverter.txt" -->W</span>
+<span id="grid_label">Grid </span><span id="grid"><!--#include file="staticdata/grid.txt" -->W</span>
 </div></p>
 <p>
 <div class="mrtg-inverter" align="center"><a href="/mrtg/inverter.html"><img src="/mrtg/inverter-day.png?i=1" alt="Inverter"/></a></div>

@@ -32,13 +32,22 @@ function showInfo() {
                         $('#grid').css({"color":"grey"});
                 }
         }).done( function(data) {
-               $('#inverter').html(data.inverter + "W");
-               $('#grid').html(data.grid + "W");
-               $('#inverter').css({"color":"black"});
-               $('#grid').css({"color":"black"});
+		// Show solar if non-zero
+		if (data.inverter > 0) {
+			$('#inverter_label').html("Solar ");
+			$('#inverter').html(data.inverter + "W");
+			$('#inverter').css({"color":"black"});
+		} else {
+			$('#inverter_label').html("");
+			$('#inverter').html("");
+		}
+
+		// Always show grid
+		$('#grid').html(data.grid + "W");
+		$('#grid').css({"color":"black"});
         });
 
-        // document.title = "solarpi " + data.voltage + "V";
+        //document.title = "solarpi " + data.voltage + "V";
 
 }
 
