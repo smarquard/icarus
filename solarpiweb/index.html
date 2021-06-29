@@ -1,15 +1,16 @@
 <html>
 <head>
 <link rel="shortcut icon" href="/favicon.ico">
-<title>Welcome to solarpi</title>
+<title>solarpi</title>
 <script src="/js/jquery.js"></script>
-<script src="/js/showinfo.js?v=7"></script>
+<script src="/js/showinfo.js?v=11"></script>
 </head>
 <body bgcolor="white" text="black" onload="initInfo()">
 <center><h1>solarpi</h1></center>
 
 <p><div align="center" style="font-size: xx-large">
-<span id="inverter_label">Solar </span><span id="inverter"><!--#include file="staticdata/inverter.txt" -->W</span>
+<span id="inverter_static"><!--#include file="staticdata/inverter_static.txt" --></span>
+<span id="inverter_label"></span><span id="inverter"></span>
 <span id="grid_label">Grid </span><span id="grid"><!--#include file="staticdata/grid.txt" -->W</span>
 </div></p>
 <p>
