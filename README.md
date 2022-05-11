@@ -1,2 +1,2 @@
 # icarus
-Home solar power management code
+Home automation code.
