@@ -1,0 +1,21 @@
+name: "Solis Inverter Proxy"
+description: "Get power metrics from Solis Inverter web interface"
+version: "1.0.1"
+slug: "solis_inverter_proxy"
+url: "https://github.com/smarquard/icarus"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+options:
+  inverter: ""
+  username: "admin"
+  password: ""
+schema:
+  inverter: str
+  username: str
+  password: password
+ports:
+  8081/tcp: 8081
