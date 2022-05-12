@@ -19,8 +19,6 @@ f.close()
 
 httpPool = urllib3.PoolManager()
 
-# sys.stderr = open('/data/powerserver_err.log', 'w')
-
 # Values we expect to read
 inverter_w = -1
 
@@ -34,7 +32,6 @@ def fetch_inverter_power():
             power = m.group(1)
             return int(power);
         else:
-            # sys.stderr.write("Error matching regex in response page:\n" + status_page);
             return -1;
 
     except Exception as e:
@@ -49,22 +46,18 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
 
-            #print("path: " + self.path)
-
             if (self.path.endswith("below_horizon")) or (self.path.endswith("favicon.ico")):
                 inverter_w = 0
             else:
                 # Fetch from inverter
                 inverter_w = fetch_inverter_power()
 
-            now = time.time()
-
             if (inverter_w >= 0):
                 self.send_response(200)
                 self.send_header("Content-type", "application/json")
                 self.send_header("Access-Control-Allow-Origin","*")
                 self.end_headers()
-                self.wfile.write(json.dumps({"now" : now, "inverter" : inverter_w}).encode('UTF-8'))
+                self.wfile.write(json.dumps({"inverter" : inverter_w}).encode('UTF-8'))
             else:
                 self.send_response(503)
                 self.send_header("Content-type", "text/html")
@@ -91,8 +84,6 @@ try:
 except KeyboardInterrupt:
     server.shutdown()
     sys.exit(0)
-
-print('Server started on port 8081')
 
 while True:
     time.sleep(1)

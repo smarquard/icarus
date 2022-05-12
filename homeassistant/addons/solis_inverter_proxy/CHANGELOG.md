@@ -1,3 +1,6 @@
+12 May 2022
+* 1.0.2 - Drop the timesstamp from the json response
+
 11 May 2022
 * First version
 * 1.0.0a - Add config
