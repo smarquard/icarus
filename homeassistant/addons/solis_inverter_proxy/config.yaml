@@ -1,6 +1,7 @@
+init: false
 name: "Solis Inverter Proxy"
 description: "Get power metrics from Solis Inverter web interface"
-version: "1.0.2a"
+version: "1.0.3a"
 slug: "solis_inverter_proxy"
 url: "https://github.com/smarquard/icarus"
 arch:

@@ -1,3 +1,6 @@
+16 May 2022
+* 1.0.3 - Don't write any body text if giving a 503 response
+
 12 May 2022
 * 1.0.2 - Drop the timesstamp from the json response
 

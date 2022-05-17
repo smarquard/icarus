@@ -60,9 +60,9 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"inverter" : inverter_w}).encode('UTF-8'))
             else:
                 self.send_response(503)
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.wfile.write("Error fetching response from inverter".encode())
+                # self.send_header("Content-type", "text/html")
+                # self.end_headers()
+                # self.wfile.write("Error fetching response from inverter".encode())
 
     def log_message(self, format, *args):
         self.log_file.write("%s - - [%s] %s\n" %
