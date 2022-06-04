@@ -1,3 +1,6 @@
+4 June 2022
+* Add today and total yield to JSON response
+
 16 May 2022
 * 1.0.3 - Don't write any body text if giving a 503 response
 
