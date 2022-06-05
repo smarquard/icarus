@@ -21,10 +21,19 @@ httpPool = urllib3.PoolManager()
 
 # Values we expect to read
 inverter_w = -1
+
+# Reset at midnight
 inverter_today = 0.0
+
+# Never reset
 inverter_total = 0.0
 
 def fetch_inverter_power():
+
+    global inverter_w
+    global inverter_today
+    global inverter_total
+
     try:
         response = httpPool.request('GET', config['inverter'], headers = auth_headers, timeout = 10)
         status_page = response.data.decode('UTF-8')
@@ -43,19 +52,19 @@ def fetch_inverter_power():
         m_total = solis_total_re.search(status_page)
 
         if m_power and m_today and m_total:
-            power = m_power.group(1)
-            today = m_today.group(1)
-            total = m_total.group(1)
-
-            return ( int(power), float(today), float(total), "active" )
+            inverter_w = int(m_power.group(1))
+            inverter_today = float(m_today.group(1))
+            inverter_total = float(m_total.group(1))
+            return "active"
         else:
-            return (-1, -1, -1, "no data" )
+            # Most likely returned a status page with empty values
+            return "no data"
 
     except Exception as e:
-        return (-2, -2, -2, "exception: {}".format(str(e)))
+        return "exception: {}".format(str(e))
 
     # Shouldn't reach here
-    return (-3, -3, -3, "unknown")
+    return "unknown"
 
 class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
 
@@ -63,13 +72,23 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
 
+            global inverter_w
+            global inverter_today
+            global inverter_total
+
+            # Reset daily total after midnight
+            if ((inverter_today > 0) and (datetime.datetime.today().hour >= 0) and (datetime.datetime.today().hour < 9)and self.path.endswith("below_horizon")):
+                inverter_today = 0
+
             if (self.path.endswith("below_horizon")) or (self.path.endswith("favicon.ico")):
-                inverter_w = 0
+                # Inverter is probably offline
+                resp_status = "inactive"
             else:
                 # Fetch from inverter
-                (inverter_w, inverter_today, inverter_total, resp_status)  = fetch_inverter_power()
+                resp_status = fetch_inverter_power()
 
-            if (inverter_w >= 0):
+            if (resp_status == "active"):
+                # Online, real values
                 self.send_response(200)
                 self.send_header("Content-type", "application/json")
                 self.send_header("Access-Control-Allow-Origin","*")
@@ -78,15 +97,44 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
                         { "inverter" : inverter_w,
                         "today" : inverter_today,
                         "total" : inverter_total,
-                        "status" : "active" }
+                        "status" : resp_status }
                     ).encode('UTF-8'))
-            else:
+
+            if (resp_status == "no data"):
+                # Return the last set of values we got
                 self.send_response(503)
-                self.send_header("Content-type", "text/html")
+                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin","*")
                 self.end_headers()
                 self.wfile.write( json.dumps(
-                        { "status": "error",
-                          "detail": resp_status }
+                        { "inverter" : inverter_w,
+                        "today" : inverter_today,
+                        "total" : inverter_total,
+                        "status" : resp_status }
+                    ).encode('UTF-8'))
+
+            if (resp_status == "inactive"):
+                # Probably offline
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin","*")
+                self.end_headers()
+                self.wfile.write( json.dumps(
+                        { "inverter" : 0,
+                        "today" : inverter_today,
+                        "total" : inverter_total,
+                        "status" : resp_status }
+                    ).encode('UTF-8'))
+
+            if (resp_status.startswith("exception") or (resp_status == "unknown")):
+                # Unknown error
+                self.send_response(500)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write( json.dumps(
+                        { "status": "unknown-error",
+                           "error": resp_status }
                     ).encode('UTF-8'))
 
 server = HTTPServer(('', 8081), MyRequestHandler)

@@ -1,3 +1,7 @@
+5 June 2022
+* Return power today in Wh and return today and total when offline
+* Reset daily total at midnight
+
 4 June 2022
 * Add today and total yield to JSON response
 
